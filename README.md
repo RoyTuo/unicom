@@ -3,7 +3,8 @@
 
 不会写东西，直接说一下怎么使用啦。。
 
-编译包下载: [https://github.com/kukume/unicom/releases/](https://github.com/kukume/unicom/releases/)
+演示站：[https://www.iheit.com/ll](https://www.iheit.com/ll)
+编译包下载： [https://github.com/kukume/unicom/releases/](https://github.com/kukume/unicom/releases/)
 
 识别验证码使用的是百度Ai的[通用文字识别](https://cloud.baidu.com/product/ocr/general)，所以需要申请百度ai的key。
 
