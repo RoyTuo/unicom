@@ -7,6 +7,7 @@ import me.kuku.repository.PrizeRepository;
 import me.kuku.service.FlowService;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -27,12 +29,18 @@ public class FlowController {
     FlowService flowService;
     @Autowired
     PrizeRepository prizeRepository;
+    @Value("${user.max}")
+    private int max;
 
     @RequestMapping("/add")
     @ResponseBody
     public PhoneLa addPhone(PhoneLa phoneLa){
-        PhoneLa phoneObj = checkPhone(phoneLa);
+        PhoneLa phoneObj = phoneRepository.findByPhone(phoneLa.getPhone());
         if (!flowService.checkUnicom(phoneLa.getPhone())){
+            return null;
+        }
+        int num = phoneRepository.findAll().size();
+        if (num > max){
             return null;
         }
         if (phoneObj != null){
@@ -45,26 +53,20 @@ public class FlowController {
     @RequestMapping("/query")
     @ResponseBody
     public List<Prize> queryPhone(@RequestParam("phone") String phone){
-        List<Prize> prizeList = prizeRepository.findAll();
-        for (Prize prize : prizeList){
-            if (!prize.getPhone().equals(phone)){
-                prizeList.remove(prize);
-            }
-        }
+        List<Prize> prizeList = prizeRepository.findAllByPhone(phone);
         return prizeList;
     }
 
     @RequestMapping("/delete")
     @ResponseBody
     public String deletePhone(@RequestParam("phone") String phone){
-        List<PhoneLa> list = phoneRepository.findAll();
-        for (PhoneLa phoneLa : list){
-            if (phoneLa.getPhone().equals(phone)){
-                phoneRepository.delete(phoneLa);
-                break;
-            }
+        PhoneLa phoneLa = phoneRepository.findByPhone(phone);
+        if (phoneLa == null){
+            return "未找到该号码";
+        }else{
+            phoneRepository.delete(phoneLa);
+            return "删除成功";
         }
-        return "删除成功";
     }
 
     @RequestMapping("/get")
@@ -93,22 +95,10 @@ public class FlowController {
             FlowService flow = new FlowService();
             flow.setHttpClient(client);
             boolean b = flow.receiveFlow(phone, captcha);
-            if (!b) {
+            if (b) {
                 session.invalidate();
             }
             return b;
         }
     }
-
-
-    public PhoneLa checkPhone(PhoneLa phoneLa){
-        List<PhoneLa> allPhoto = phoneRepository.findAll();
-        for (PhoneLa phoneLaObj : allPhoto){
-            if (phoneLaObj.getPhone().equals(phoneLa.getPhone())){
-                return phoneLaObj;
-            }
-        }
-        return null;
-    }
-
 }
