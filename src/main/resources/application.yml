@@ -14,6 +14,14 @@ spring:
   thymeleaf:
     cache: false
 user:
-  apikey: xxx
-  secretkey: xxx
   max: 400
+#支持多个key，每个key调用199次切换下一个。
+  key:
+    - apiKey: xxx
+      secretKey: xxx
+#    - apiKey: xxx
+#      secretKey: xxx
+#    - apiKey: xxx
+#      secretKey: xxx
+#    - apiKey: xxx
+#      secretKey: xxx

@@ -2,6 +2,7 @@ package me.kuku.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import me.kuku.bean.User;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -25,10 +26,12 @@ public class LotteryService {
 
     private CloseableHttpClient httpClient = null;
     private BasicCookieStore basicCookieStore = null;
+    private BaiDuAIService baiDuAIService = null;
 
     public LotteryService(){
         basicCookieStore = new BasicCookieStore();
         httpClient = HttpClients.custom().setDefaultCookieStore(basicCookieStore).build();
+        baiDuAIService = new BaiDuAIService();
     }
 
     public String getUserId(){
@@ -178,15 +181,14 @@ public class LotteryService {
         return gift;
     }
 
-    public String run(String phone){
-        BaiDuAIService baiDuAIService = new BaiDuAIService();
+    public String run(String phone, User user){
         String userId = getUserId();
         byte[] captchaImg = getCaptchaImg(userId);
         String encryptMobile = null;
         String code = null;
         String gifts = "";
         while (true){
-            code = baiDuAIService.Literacy(captchaImg);
+            code = baiDuAIService.Literacy(captchaImg, user);
             if (code == null){
                 captchaImg = getCaptchaImg(userId);
                 continue;

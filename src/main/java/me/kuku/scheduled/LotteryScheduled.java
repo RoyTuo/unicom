@@ -1,9 +1,11 @@
 package me.kuku.scheduled;
 
+import me.kuku.bean.User;
 import me.kuku.entity.PhoneLa;
 import me.kuku.entity.Prize;
 import me.kuku.repository.PhoneRepository;
 import me.kuku.repository.PrizeRepository;
+import me.kuku.service.BaiDuAIService;
 import me.kuku.service.LotteryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -23,14 +25,19 @@ public class LotteryScheduled {
     PhoneRepository phoneRepository;
     @Autowired
     PrizeRepository prizeRepository;
+    @Autowired
+    BaiDuAIService baiDuAIService;
+    @Autowired
+    User user;
 
     @Scheduled(cron = "0 1 0 * * ?")
     public void flow() throws Exception{
         List<PhoneLa> phoneAll = phoneRepository.findAll();
+        String token = "";
         String phone = "";
         for (PhoneLa phoneLa : phoneAll){
             phone = phoneLa.getPhone();
-            String gifts = lotteryService.run(phone);
+            String gifts = lotteryService.run(phone, user);
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }

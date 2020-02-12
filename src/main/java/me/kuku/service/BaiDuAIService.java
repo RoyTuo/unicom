@@ -2,6 +2,8 @@ package me.kuku.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import me.kuku.bean.Key;
+import me.kuku.bean.User;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +27,12 @@ import java.util.List;
 @Service
 public class BaiDuAIService {
 
+
     private CloseableHttpClient httpClient = null;
-    @Value("${user.apikey}")
-    private String API_KEY;
-    @Value("${user.secretkey}")
-    private String SECRET_KEY;
 
-
+    private int num = 0;
+    private int i = -1;
+    private String token = "";
 
 
     public BaiDuAIService(){
@@ -38,7 +40,7 @@ public class BaiDuAIService {
     }
 
     //
-    public String getToken(){
+    public String getToken(String API_KEY, String SECRET_KEY){
         HttpGet httpGet = new HttpGet("https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=" + API_KEY +
                 "&client_secret=" + SECRET_KEY);
         String token = null;
@@ -46,6 +48,7 @@ public class BaiDuAIService {
             CloseableHttpResponse execute = httpClient.execute(httpGet);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String result = EntityUtils.toString(execute.getEntity(), "utf8");
+                System.out.println(result);
                 token = JSON.parseObject(result).getString("access_token");
             }
         } catch (IOException e) {
@@ -54,9 +57,18 @@ public class BaiDuAIService {
         return token;
     }
 
-    public String Literacy(byte[] imgByte){
+    public String Literacy(byte[] imgByte, User user){
 //        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + ACCESS_TOKEN);
-        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/numbers?access_token=" + getToken());
+        if (num == 0 || num > 198){
+            num = 0;
+            i++;
+            if (i == user.getKey().size()){
+                throw new RuntimeException("木得免费次数了");
+            }
+            token = getToken(user.getKey().get(i).getApiKey(), user.getKey().get(i).getSecretKey());
+        }
+        num++;
+        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/numbers?access_token=" + token);
         String words = null;
         List<NameValuePair> params = new ArrayList<>();
         Base64.Encoder encoder = Base64.getEncoder();
