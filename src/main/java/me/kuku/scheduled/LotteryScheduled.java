@@ -27,15 +27,11 @@ public class LotteryScheduled {
     @Scheduled(cron = "0 1 0 * * ?")
     public void flow() throws Exception{
         List<PhoneLa> phoneAll = phoneRepository.findAll();
-        String lotteryStr = "", phone = "";
+        String phone = "";
         for (PhoneLa phoneLa : phoneAll){
-            lotteryStr = "";
             phone = phoneLa.getPhone();
-            for (int i = 0; i < 3; i++) {
-                String prize = lotteryService.run(phone);
-                lotteryStr += prize + "；";
-            }
-            prizeRepository.save(new Prize(null, phone, lotteryStr, new Date(new java.util.Date().getTime())));
+            String gifts = lotteryService.run(phone);
+            prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }
 }

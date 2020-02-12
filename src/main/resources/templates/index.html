@@ -104,7 +104,7 @@
                     let ele = '<div class="table-responsive"><table class="table">';
                     ele += '<tr><th>日期</th><th>奖品</th></tr>';
                     for (i = 0; i < data.length; i++){
-                        prize = data[0]
+                        prize = data[i]
                         ele += '<tr><td>' + prize["date"] + '</td><td>' + prize["prize"] + '</td></tr>';
                     }
                     ele += '</table></div>';

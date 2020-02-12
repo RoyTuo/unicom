@@ -31,6 +31,8 @@ public class BaiDuAIService {
     private String SECRET_KEY;
 
 
+
+
     public BaiDuAIService(){
         httpClient = HttpClients.custom().build();
     }
@@ -53,7 +55,8 @@ public class BaiDuAIService {
     }
 
     public String Literacy(byte[] imgByte){
-        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + getToken());
+//        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + ACCESS_TOKEN);
+        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/numbers?access_token=" + getToken());
         String words = null;
         List<NameValuePair> params = new ArrayList<>();
         Base64.Encoder encoder = Base64.getEncoder();
@@ -65,6 +68,9 @@ public class BaiDuAIService {
             if (execute.getStatusLine().getStatusCode() == 200){
                 String result = EntityUtils.toString(execute.getEntity(), "utf8");
                 JSONArray word = JSON.parseObject(result).getJSONArray("words_result");
+                if (word == null || word.size() == 0){
+                    return null;
+                }
                 words = word.getJSONObject(0).getString("words");
             }
         } catch (IOException e) {

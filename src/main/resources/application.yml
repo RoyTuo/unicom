@@ -14,6 +14,6 @@ spring:
   thymeleaf:
     cache: false
 user:
-  apikey:
-  secretkey:
+  apikey: xxx
+  secretkey: xxx
   max: 400

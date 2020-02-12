@@ -184,8 +184,13 @@ public class LotteryService {
         byte[] captchaImg = getCaptchaImg(userId);
         String encryptMobile = null;
         String code = null;
+        String gifts = "";
         while (true){
             code = baiDuAIService.Literacy(captchaImg);
+            if (code == null){
+                captchaImg = getCaptchaImg(userId);
+                continue;
+            }
             encryptMobile = getMobile(phone, code, userId);
             if (encryptMobile != null){
                 break;
@@ -193,7 +198,9 @@ public class LotteryService {
                 captchaImg = getCaptchaImg(userId);
             }
         }
-        String lottery = lottery(encryptMobile, code, userId);
-        return lottery;
+        for (int i = 0; i < 3; i++) {
+            gifts += lottery(encryptMobile, code, userId) + "；";
+        }
+        return gifts;
     }
 }
