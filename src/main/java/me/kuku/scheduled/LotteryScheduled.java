@@ -26,18 +26,16 @@ public class LotteryScheduled {
     @Autowired
     PrizeRepository prizeRepository;
     @Autowired
-    BaiDuAIService baiDuAIService;
-    @Autowired
     User user;
 
     @Scheduled(cron = "0 1 0 * * ?")
     public void flow() throws Exception{
         List<PhoneLa> phoneAll = phoneRepository.findAll();
-        String token = "";
+        BaiDuAIService baiDuAIService = new BaiDuAIService();
         String phone = "";
         for (PhoneLa phoneLa : phoneAll){
             phone = phoneLa.getPhone();
-            String gifts = lotteryService.run(phone, user);
+            String gifts = lotteryService.run(phone, user, baiDuAIService);
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }

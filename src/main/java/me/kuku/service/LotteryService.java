@@ -26,12 +26,10 @@ public class LotteryService {
 
     private CloseableHttpClient httpClient = null;
     private BasicCookieStore basicCookieStore = null;
-    private BaiDuAIService baiDuAIService = null;
 
     public LotteryService(){
         basicCookieStore = new BasicCookieStore();
         httpClient = HttpClients.custom().setDefaultCookieStore(basicCookieStore).build();
-        baiDuAIService = new BaiDuAIService();
     }
 
     public String getUserId(){
@@ -181,7 +179,7 @@ public class LotteryService {
         return gift;
     }
 
-    public String run(String phone, User user){
+    public String run(String phone, User user, BaiDuAIService baiDuAIService){
         String userId = getUserId();
         byte[] captchaImg = getCaptchaImg(userId);
         String encryptMobile = null;
