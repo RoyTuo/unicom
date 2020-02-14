@@ -14,6 +14,12 @@
 配置文件说明：
 ![](https://img.kuku.me/links/kuku/126cb0211042025.png)
 
+## 环境要求
+
+* MySQL
+* jdk
+* nginx/apache（如需域名访问）
+
 ## 部署
 
 安装java，如是[宝塔](http://bt.cn)或者[oneinstack](https://oneinstack.com)，只需安装`tomcat`即可
