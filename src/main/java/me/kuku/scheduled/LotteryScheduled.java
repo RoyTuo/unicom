@@ -28,7 +28,7 @@ public class LotteryScheduled {
     @Autowired
     User user;
 
-    @Scheduled(cron = "0 1 0 * * ?")
+    @Scheduled(cron = "${user.cron}")
     public void flow() throws Exception{
         List<PhoneLa> phoneAll = phoneRepository.findAll();
         BaiDuAIService baiDuAIService = new BaiDuAIService();
