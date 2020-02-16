@@ -10,6 +10,7 @@
 ## 环境
 * JDK
 * MySQL
+* nginx/apache（如需域名访问）
 
 快捷方法安装吧。
 
@@ -25,6 +26,7 @@ wget -O install.sh http://download.bt.cn/install/install-ubuntu_6.0.sh && sudo b
 wget -O install.sh http://download.bt.cn/install/install-ubuntu_6.0.sh && bash install.sh
 ```
 打开宝塔面板，只需要在应用商店安装好`tomcat9`就会带有`JDK1.8`环境。
+然后在应用商店安装好`mysql`。
 
 ## 安装
 
@@ -45,4 +47,13 @@ java -jar unicom.jar
 #这样的话首次获取session的时间会非常长，可以这样运行
 java -Djava.security.egd=file:/dev/./urandom -jar unicom.jar
 ```
-如需持久化运行，查阅`screen`的使用，运行之后打开`http://IP地址:8099`即可
+如需持久化运行，可以使用`screen`
+```shell
+cd /root/java
+screen -dmS unicom java -jar unicom.jar
+#这样的话首次获取session的时间会非常长，可以这样运行
+screen -dmS unicom java -Djava.security.egd=file:/dev/./urandom -jar unicom.jar
+```
+运行之后打开`http://IP地址:8099`即可
+
+如果需要域名访问，在宝塔中添加反向代理，代理地址设置为`http://localhost://8099`即可
