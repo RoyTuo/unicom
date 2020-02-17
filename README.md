@@ -32,7 +32,7 @@ wget -O install.sh http://download.bt.cn/install/install-ubuntu_6.0.sh && bash i
 
 下载[编译包](https://github.com/kukume/unicom/releases)，更改`application.yml`中的配置
 
-~~`apikey`和`secretKey`为百度ai的[数字识别](https://ai.baidu.com/tech/ocr_others/numbers)，创建应用，选择数字识别，把key填进去即可。
+~~`apikey`和`secretKey`为百度ai的[数字识别](https://ai.baidu.com/tech/ocr_others/numbers)，创建应用，选择数字识别，把key填进去即可。~~
 
 默认使用[这个大佬](https://github.com/teenyda/qingdao/tree/outwitTheMilk)的识别验证码接口，所以可以不用申请百度的key了，这个接口gg的话才会调用百度ai的接口
 
@@ -58,4 +58,4 @@ screen -dmS unicom java -Djava.security.egd=file:/dev/./urandom -jar unicom.jar
 ```
 运行之后打开`http://IP地址:8099`即可
 
-如果需要域名访问，在宝塔中添加反向代理，代理地址设置为`http://localhost://8099`即可
+如果需要域名访问，在宝塔中添加反向代理，代理地址设置为`http://localhost:8099`即可
