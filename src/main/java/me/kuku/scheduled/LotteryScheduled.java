@@ -31,11 +31,10 @@ public class LotteryScheduled {
     @Scheduled(cron = "${user.cron}")
     public void flow() throws Exception{
         List<PhoneLa> phoneAll = phoneRepository.findAll();
-        BaiDuAIService baiDuAIService = new BaiDuAIService();
         String phone = "";
         for (PhoneLa phoneLa : phoneAll){
             phone = phoneLa.getPhone();
-            String gifts = lotteryService.run(phone, user, baiDuAIService);
+            String gifts = lotteryService.run(phone, user, new BaiDuAIService());
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }

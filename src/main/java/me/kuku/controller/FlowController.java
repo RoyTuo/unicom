@@ -37,6 +37,7 @@ public class FlowController {
     @RequestMapping("/")
     public String toIndex(Map<String, Object> map){
         map.put("con", user.getHtmlCon());
+        map.put("max", user.getMax());
         return "index";
     }
 

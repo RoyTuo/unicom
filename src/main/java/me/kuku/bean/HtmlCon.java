@@ -5,6 +5,15 @@ public class HtmlCon {
     private String title;
     private String copyright;
     private String ico;
+    private String lotteryText;
+
+    public String getLotteryText() {
+        return lotteryText;
+    }
+
+    public void setLotteryText(String lotteryText) {
+        this.lotteryText = lotteryText;
+    }
 
     public String getIco() {
         return ico;
