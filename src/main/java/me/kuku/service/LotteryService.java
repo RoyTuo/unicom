@@ -58,7 +58,7 @@ public class LotteryService {
     }
 
     public String getCaptcha(String captchaUrl){
-        HttpPost httpPost = new HttpPost("http://47.94.234.77:9527/getCode");
+        HttpPost httpPost = new HttpPost("https://www.iheit.com/getCode");
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("url", captchaUrl));
         String str = null;

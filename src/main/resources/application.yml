@@ -29,7 +29,8 @@ user:
     ico: https://www.kuku.me/favicon.ico
   #定时器，此为每天的00:01运行
   cron: 0 1 0 * * ?
-  #默认使用大佬的接口，如接口gg，才使用百度ai的key。支持多个key，每个key调用199次切换下一个。
+  #支持多个key，每个key调用199次切换下一个。
+  #不需要使用这个了。。
   key:
     - apiKey: xxx
       secretKey: xxx

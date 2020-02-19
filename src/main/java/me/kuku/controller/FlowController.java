@@ -44,7 +44,7 @@ public class FlowController {
     @RequestMapping("/add")
     @ResponseBody
     public Integer addPhone(PhoneLa phoneLa){
-        PhoneLa phoneObj = phoneRepository.findByPhone(phoneLa.getPhone());
+        List<PhoneLa> list = phoneRepository.findAllByPhone(phoneLa.getPhone());
         if (!flowService.checkUnicom(phoneLa.getPhone())){
             return -2;
         }
@@ -52,7 +52,7 @@ public class FlowController {
         if (num > user.getMax()){
             return -1;
         }
-        if (phoneObj != null){
+        if (list.size() != 0){
             return 0;
         }
         PhoneLa save = phoneRepository.save(phoneLa);
@@ -69,11 +69,16 @@ public class FlowController {
     @RequestMapping("/delete")
     @ResponseBody
     public String deletePhone(@RequestParam("phone") String phone){
-        PhoneLa phoneLa = phoneRepository.findByPhone(phone);
-        if (phoneLa == null){
+        List<PhoneLa> list = phoneRepository.findAllByPhone(phone);
+        if (list.size() == 0){
             return "未找到该号码";
-        }else{
-            phoneRepository.delete(phoneLa);
+        }else if (list.size() == 1){
+            phoneRepository.delete(list.get(0));
+            return "删除成功";
+        }else {
+            for (PhoneLa phoneLa : list){
+                phoneRepository.delete(phoneLa);
+            }
             return "删除成功";
         }
     }

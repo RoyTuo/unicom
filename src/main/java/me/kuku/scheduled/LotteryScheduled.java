@@ -35,6 +35,9 @@ public class LotteryScheduled {
         for (PhoneLa phoneLa : phoneAll){
             phone = phoneLa.getPhone();
             String gifts = lotteryService.run(phone, user, new BaiDuAIService());
+            if (gifts.contains("没有抽奖次数了")){
+                phoneRepository.delete(phoneLa);
+            }
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class FlowService {
@@ -90,28 +91,9 @@ public class FlowService {
     }
 
     public boolean checkUnicom(String number){
-        HttpPost httpPost = new HttpPost("https://www.mxnzp.com/api/mobile_location/aim_mobile");
-        boolean status = false;
-        List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("app_id", "ghpgtsokjvkjdmlk"));
-        params.add(new BasicNameValuePair("app_secret", "N2hNMC93empxb0twUW1jd1FRbVVtQT09"));
-        params.add(new BasicNameValuePair("mobile", number));
-        try {
-            httpPost.setEntity(new UrlEncodedFormEntity(params, "utf8"));
-            CloseableHttpResponse execute = httpClient.execute(httpPost);
-            if (execute.getStatusLine().getStatusCode() == 200){
-                String result = EntityUtils.toString(execute.getEntity(), "utf8");
-                JSONObject data = JSON.parseObject(result).getJSONObject("data");
-                if (data == null){
-                    status = false;
-                }else{
-                    status = data.getString("carrier").contains("联通");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return status;
+        String regex = "^1[35678]\\d{9}$";
+        boolean b = Pattern.matches(regex, number);
+        return b;
     }
 
 }
