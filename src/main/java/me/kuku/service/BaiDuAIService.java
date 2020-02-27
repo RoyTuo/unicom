@@ -57,7 +57,6 @@ public class BaiDuAIService {
     }
 
     public String Literacy(byte[] imgByte, User user){
-//        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + ACCESS_TOKEN);
         if (num == 0 || num > 198){
             num = 0;
             i++;
@@ -67,6 +66,7 @@ public class BaiDuAIService {
             token = getToken(user.getKey().get(i).getApiKey(), user.getKey().get(i).getSecretKey());
         }
         num++;
+//        HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/general_basic?access_token=" + token);
         HttpPost httpPost = new HttpPost("https://aip.baidubce.com/rest/2.0/ocr/v1/numbers?access_token=" + token);
         String words = null;
         List<NameValuePair> params = new ArrayList<>();
@@ -78,6 +78,7 @@ public class BaiDuAIService {
             CloseableHttpResponse execute = httpClient.execute(httpPost);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String result = EntityUtils.toString(execute.getEntity(), "utf8");
+                System.out.println(result);
                 JSONArray word = JSON.parseObject(result).getJSONArray("words_result");
                 if (word == null || word.size() == 0){
                     return null;

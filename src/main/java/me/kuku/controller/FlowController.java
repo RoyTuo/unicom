@@ -5,15 +5,14 @@ import me.kuku.entity.PhoneLa;
 import me.kuku.entity.Prize;
 import me.kuku.repository.PhoneRepository;
 import me.kuku.repository.PrizeRepository;
+import me.kuku.service.CodeService;
 import me.kuku.service.FlowService;
+import me.kuku.service.LotteryService;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +31,8 @@ public class FlowController {
     @Autowired
     PrizeRepository prizeRepository;
     @Autowired
+    CodeService codeService;
+    @Autowired
     User user;
 
     @RequestMapping("/")
@@ -43,7 +44,15 @@ public class FlowController {
 
     @RequestMapping("/add")
     @ResponseBody
-    public Integer addPhone(PhoneLa phoneLa){
+    public Integer addPhone(PhoneLa phoneLa, @RequestParam("code") String code, HttpServletRequest request){
+        String myCode = (String) request.getSession().getAttribute("code");
+        if (myCode != null){
+            if (!myCode.equals(code.toUpperCase())) {
+                return -3;
+            }
+        }else{
+            return -3;
+        }
         List<PhoneLa> list = phoneRepository.findAllByPhone(phoneLa.getPhone());
         if (!flowService.checkUnicom(phoneLa.getPhone())){
             return -2;
@@ -114,5 +123,11 @@ public class FlowController {
             }
             return b;
         }
+    }
+
+    @GetMapping("/creatCode")
+    @ResponseBody
+    public void creatCode(HttpServletRequest request, HttpServletResponse response){
+        codeService.creatVerifyCode(request, response);
     }
 }

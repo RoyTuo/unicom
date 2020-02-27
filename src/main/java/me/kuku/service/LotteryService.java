@@ -165,7 +165,7 @@ public class LotteryService {
                 }else if (status == 400 || status == 700){
                     return "抽奖人数过多";
                 }else if (jsonObject.getBoolean("isunicom").equals(false)){
-                    return "错误：" + jsonObject.getString("msg");
+                    return "不是联通号码";
                 }else if (status == 200 || status == 0){
                     String level = jsonObject.getJSONObject("data").getString("level");
                     switch (level){
@@ -193,7 +193,11 @@ public class LotteryService {
                         default:
                             gift = "未知奖品";
                     }
+                }else{
+                    System.out.println(result);
                 }
+            }else{
+                gift = execute.getStatusLine().getStatusCode() + "";
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -223,7 +227,11 @@ public class LotteryService {
         }
         for (int i = 0; i < 3; i++) {
             gifts += lottery(encryptMobile, code, userId) + "；";
+            if (gifts.contains("联通")){
+                return null;
+            }
         }
         return gifts;
     }
+
 }

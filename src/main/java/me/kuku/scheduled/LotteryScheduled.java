@@ -13,7 +13,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 @Component
 @EnableScheduling
@@ -32,11 +34,30 @@ public class LotteryScheduled {
     public void flow() throws Exception{
         List<PhoneLa> phoneAll = phoneRepository.findAll();
         String phone = "";
+        Calendar calendar = Calendar.getInstance(Locale.CHINA);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        if (day == 1){
+            prizeRepository.deleteAll();
+        }
         for (PhoneLa phoneLa : phoneAll){
             phone = phoneLa.getPhone();
+            List<Prize> prizes = prizeRepository.findAllByPhone(phone);
+            int num = 0;
+            for (Prize prize : prizes){
+                String p = prize.getPrize();
+                String[] split = p.split("；");
+                for (String str : split){
+                    if (str.contains("流量")){
+                        String sss = str.substring(0, str.lastIndexOf("m"));
+                        num += Integer.parseInt(sss);
+                    }
+                }
+            }
+            if (num >= 1000) continue;
             String gifts = lotteryService.run(phone, user, new BaiDuAIService());
-            if (gifts.contains("没有抽奖次数了")){
+            if (gifts == null || gifts.contains("没有抽奖次数了")){
                 phoneRepository.delete(phoneLa);
+                continue;
             }
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
