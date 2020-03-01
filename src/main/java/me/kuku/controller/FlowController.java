@@ -36,9 +36,14 @@ public class FlowController {
     User user;
 
     @RequestMapping("/")
-    public String toIndex(Map<String, Object> map){
+    public String toIndex(Map<String, Object> map, @RequestParam(value = "type", required = false) String type){
         map.put("con", user.getHtmlCon());
         map.put("max", user.getMax());
+        if ("pj".equals(type)){
+            map.put("type", "pj");
+        }else{
+            map.put("type", "cj");
+        }
         return "index";
     }
 
@@ -57,7 +62,7 @@ public class FlowController {
         if (!flowService.checkUnicom(phoneLa.getPhone())){
             return -2;
         }
-        int num = phoneRepository.findAll().size();
+        Long num = phoneRepository.count();
         if (num > user.getMax()){
             return -1;
         }

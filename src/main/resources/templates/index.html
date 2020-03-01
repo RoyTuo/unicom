@@ -27,7 +27,7 @@
     </div><!-- /.modal -->
 
     <div class="container">
-        <div class="panel panel-primary">
+        <div th:if="${type} eq pj" class="panel panel-primary">
             <div class="panel-heading">青岛啤酒流量</div>
             <div class="panel-body">
                 <form id="flow">
@@ -44,12 +44,13 @@
                     <div style="margin-top: 20px" class="">
                         <p>注：青岛啤酒领流量，仅限联通号码使用，一天只能获取 3 次验证码(60秒内一次)，故一天最多只能领3次流量，一次30M，一月最多领10次(300M)。获取验证码之后如若没验证成功，可能将无法
                         获取验证码</p>
+                        <p><a href="/">切换到抽奖挂机</a></p>
                     </div>
                 </form>
             </div>
         </div>
 
-        <div class="panel panel-primary">
+        <div th:if="${type} eq cj" class="panel panel-primary">
             <div class="panel-heading">趣味天天摇（抽奖挂机）</div>
             <div class="panel-body">
                 <form id="cron">
@@ -71,10 +72,11 @@
                     <input type="button" class="btn btn-primary query" value="查询中奖结果">
                     <input type="button" class="btn btn-primary delete" value="删除">
                     <div style="margin-top: 20px">
-                        <p style="color: red" th:utext="${con.getLotteryText()+'抽奖若为<没有抽奖次数了>，将删除该号码'}"></p>
+                        <p th:if="${con.getLotteryText()} ne ''" style="color: red" th:utext="${con.getLotteryText()}"></p>
                         <p>注：青岛啤酒(趣味天天摇)抽奖，仅限联通号码使用，一天抽奖3次，可能抽中50MB流量、100MB流量、1000MB流量、20钻石、幸运奖、15或50的开卡礼包（后2个都是没吊用的），
                             只要添加手机号码挂机，本系统将在凌晨（00:01）自动为你抽奖。系统会保存你的手机号码，介意请勿使用！已添加的可自行查询删掉。(经验：一个手机号码貌似一个月累计最多能抽中1000M
                             ，中不中流量看运气), 暂设置添加手机号最大数量为[[${max}]]</p>
+                        <p><a href="?type=pj">切换到青岛啤酒流量</a></p>
                     </div>
                 </form>
             </div>

@@ -30,57 +30,12 @@ public class LotteryScheduled {
     PrizeRepository prizeRepository;
     @Autowired
     User user;
-    @Value("${user.type}")
-    int type;
 
-    private List<PhoneLa> phoneAll;
-    private Long count;
-
-    @Scheduled(cron = "${user.cron1}")
-    public void flow1() throws Exception{
-        if (type == 1) {
-            phoneAll = phoneRepository.findAll();
-            count = phoneRepository.count();
-            delPrize();
-            if (count > 300) {
-                run(phoneAll, 0, 300);
-            } else {
-                run(phoneAll, 0, Integer.parseInt(String.valueOf(count)));
-            }
-        }
-    }
-
-    @Scheduled(cron = "${user.cron2}")
-    public void flow2() throws Exception{
-        if (type == 1) {
-            if (count > 600) {
-                run(phoneAll, 300, 600);
-            } else if (count > 300 && count < 600) {
-                run(phoneAll, 300, Integer.parseInt(String.valueOf(count)));
-            }
-        }
-    }
-
-    @Scheduled(cron = "${user.cron3}")
-    public void flow3() throws Exception{
-        if (type == 1) {
-            if (count > 600) {
-                run(phoneAll, 600, Integer.parseInt(String.valueOf(count)));
-            }
-        }
-    }
 
     @Scheduled(cron = "${user.cron}")
     public void flow() throws Exception{
-        if (type == 0) {
-            delPrize();
-            phoneAll = phoneRepository.findAll();
-            count = phoneRepository.count();
-            run(phoneAll, 0, Integer.parseInt(String.valueOf(count)));
-        }
-    }
-
-    public void run(List<PhoneLa> phoneAll, int start, int end){
+        delPrize();
+        List<PhoneLa> phoneAll = phoneRepository.findAll();
         String phone = "";
         for (PhoneLa phoneLa : phoneAll){
             phone = phoneLa.getPhone();
@@ -106,6 +61,7 @@ public class LotteryScheduled {
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }
+
 
     public void delPrize(){
         Calendar calendar = Calendar.getInstance(Locale.CHINA);

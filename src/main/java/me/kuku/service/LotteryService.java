@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import me.kuku.bean.User;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -21,22 +22,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Service
 public class LotteryService {
 
     private CloseableHttpClient httpClient = null;
     private BasicCookieStore basicCookieStore = null;
+    private RequestConfig requestConfig = null;
 
     public LotteryService(){
         basicCookieStore = new BasicCookieStore();
-        httpClient = HttpClients.custom().setDefaultCookieStore(basicCookieStore).build();
+        requestConfig = RequestConfig.custom().setSocketTimeout(5000).setConnectionRequestTimeout(5000)
+                .setConnectTimeout(5000).build();
+        httpClient = HttpClients.custom().setDefaultCookieStore(basicCookieStore).setDefaultRequestConfig(requestConfig).build();
     }
 
     public String getUserId(){
         HttpGet httpGet = new HttpGet("http://m.client.10010.com/sma-lottery/qpactivity/qingpiindex");
         String id = null;
+        CloseableHttpResponse execute = null;
         try {
-            CloseableHttpResponse execute = httpClient.execute(httpGet);
+            execute = httpClient.execute(httpGet);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String html = EntityUtils.toString(execute.getEntity(), "utf8");
                 List<Cookie> cookies = basicCookieStore.getCookies();
@@ -49,6 +53,14 @@ public class LotteryService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return id;
     }
@@ -62,12 +74,21 @@ public class LotteryService {
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("url", captchaUrl));
         String str = null;
+        CloseableHttpResponse execute = null;
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(params, "utf8"));
-            CloseableHttpResponse execute = httpClient.execute(httpPost);
+            execute = httpClient.execute(httpPost);
             str = EntityUtils.toString(execute.getEntity(), "utf8");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return str;
     }
@@ -77,8 +98,9 @@ public class LotteryService {
         byte[] byteArr = null;
         InputStream is = null;
         ByteArrayOutputStream bao = null;
+        CloseableHttpResponse execute = null;
         try {
-            CloseableHttpResponse execute = httpClient.execute(httpGet);
+            execute = httpClient.execute(httpGet);
             if (execute.getStatusLine().getStatusCode() == 200) {
                 is = execute.getEntity().getContent();
                 bao = new ByteArrayOutputStream();
@@ -106,6 +128,13 @@ public class LotteryService {
                     e.printStackTrace();
                 }
             }
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return byteArr;
     }
@@ -114,13 +143,14 @@ public class LotteryService {
     public String getMobile(String phone, String captcha, String userId){
         HttpPost httpPost = new HttpPost("http://m.client.10010.com/sma-lottery/validation/qpImgValidation.htm");
         String mobile = null;
+        CloseableHttpResponse execute = null;
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("mobile", phone));
         params.add(new BasicNameValuePair("image", captcha));
         params.add(new BasicNameValuePair("userid", userId));
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(params, "utf8"));
-            CloseableHttpResponse execute = httpClient.execute(httpPost);
+            execute = httpClient.execute(httpPost);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String result = EntityUtils.toString(execute.getEntity(), "utf8");
                 //{"code":"YES","mobile":"fb2f3802770d041736ccb642ef96adc1"}
@@ -131,6 +161,14 @@ public class LotteryService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }  finally {
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return mobile;
     }
@@ -138,13 +176,14 @@ public class LotteryService {
     public String lottery(String encryptPhone, String captcha, String userId){
         HttpPost httpPost = new HttpPost("http://m.client.10010.com/sma-lottery/qpactivity/qpLuckdraw.htm");
         String gift = "";
+        CloseableHttpResponse execute = null;
         List<NameValuePair> params = new ArrayList<>();
         params.add(new BasicNameValuePair("mobile", encryptPhone));
         params.add(new BasicNameValuePair("image", captcha));
         params.add(new BasicNameValuePair("userid", userId));
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(params, "utf8"));
-            CloseableHttpResponse execute = httpClient.execute(httpPost);
+            execute = httpClient.execute(httpPost);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String result = EntityUtils.toString(execute.getEntity(), "utf8");
                 //{"data":{"assetCategory":"0","assetName":"100MB","everyDayNum":"2000","id":"qp100","level":"6","price":"100","prizeCount":"17694885424"},"isunicom":true,"msg":"2","status":200}
@@ -201,6 +240,14 @@ public class LotteryService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return gift;
     }

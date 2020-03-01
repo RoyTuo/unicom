@@ -34,26 +34,16 @@ user:
   #懒得用数据库了，用数据库我还要写后台，我懒
   htmlCon:
     #标题
-    title: 撸流量
+    title: 青岛啤酒
     #抽奖挂机上面的红色字
-    lotteryText: 不需要百度ai啦。
+    lotteryText:
     #底部版权说明
     copyright: <a target="_blank" href="https://github.com/kukume/unicom">GitHub</a>，By <a target="_blank" href="https://www.kuku.me">kuku</a>，<a href="http://beian.miit.gov.cn" target="_blank">湘ICP备19013011号</a>
     #小图标链接
     ico: https://www.kuku.me/favicon.ico
   #定时器
-  #一次全部运行完
   #此为每天的00:01运行
   cron: 0 1 0 * * ?
-  #分三次运行
-  #此为每天的00:01运行
-  cron1: 0 1 0 * * ?
-  #此为每天的00:15运行
-  cron2: 0 15 0 * * ?
-  #此为每天的00:30运行
-  cron3: 0 30 0 * * ?
-  #type为0，将一次运行，type为1，将分3次运行
-  type: 0
   #支持多个key，每个key调用199次切换下一个。
   #不需要使用这个了。。
   key:

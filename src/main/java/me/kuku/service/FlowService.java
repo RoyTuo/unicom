@@ -13,6 +13,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.SessionScope;
 
 import javax.swing.text.html.parser.Entity;
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
+@SessionScope
 public class FlowService {
     private CloseableHttpClient httpClient = null;
     private BasicCookieStore basicCookieStore = null;
@@ -46,12 +48,13 @@ public class FlowService {
             return code;
         }
         HttpPost httpPost = new HttpPost("https://m.10010.com/god/AirCheckMessage/sendCaptcha");
+        CloseableHttpResponse execute = null;
         List<NameValuePair> param = new ArrayList<>();
         param.add(new BasicNameValuePair("phoneVal", phoneNumber));
         param.add(new BasicNameValuePair("type", "21"));
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(param, "utf8"));
-            CloseableHttpResponse execute = httpClient.execute(httpPost);
+            execute = httpClient.execute(httpPost);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String result = EntityUtils.toString(execute.getEntity(), "utf8");
                 //{"RespCode":"10001","RespMsg":"号码:17673373494一天最多只能发送三次青啤流量兑换验证码短信。"}
@@ -67,6 +70,14 @@ public class FlowService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return code;
     }
@@ -74,8 +85,9 @@ public class FlowService {
     public boolean receiveFlow(String number, String captcha){
         HttpGet httpGet = new HttpGet("https://m.10010.com/god/qingPiCard/flowExchange?number=" + number + "&type=21&captcha=" + captcha);
         boolean status = false;
+        CloseableHttpResponse execute = null;
         try {
-            CloseableHttpResponse execute = httpClient.execute(httpGet);
+            execute = httpClient.execute(httpGet);
             if (execute.getStatusLine().getStatusCode() == 200){
                 String str = EntityUtils.toString(execute.getEntity(), "utf8");
                 //{"respDesc":"验证码错误","respCode":"1001"}
@@ -86,6 +98,14 @@ public class FlowService {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (execute != null){
+                try {
+                    execute.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return status;
     }
