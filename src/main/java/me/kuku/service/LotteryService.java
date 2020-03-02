@@ -93,52 +93,6 @@ public class LotteryService {
         return str;
     }
 
-    public byte[] getCaptchaImg(String userId){
-        HttpGet httpGet = new HttpGet(getCaptchaUrl(userId));
-        byte[] byteArr = null;
-        InputStream is = null;
-        ByteArrayOutputStream bao = null;
-        CloseableHttpResponse execute = null;
-        try {
-            execute = httpClient.execute(httpGet);
-            if (execute.getStatusLine().getStatusCode() == 200) {
-                is = execute.getEntity().getContent();
-                bao = new ByteArrayOutputStream();
-                int len;
-                byte[] buffer = new byte[1024];
-                while ((len = is.read(buffer)) != -1){
-                    bao.write(buffer, 0 , len);
-                }
-                byteArr = bao.toByteArray();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if (is != null){
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (bao != null){
-                try {
-                    bao.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (execute != null){
-                try {
-                    execute.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return byteArr;
-    }
-
     //返回值为null  为验证码错误
     public String getMobile(String phone, String captcha, String userId){
         HttpPost httpPost = new HttpPost("http://m.client.10010.com/sma-lottery/validation/qpImgValidation.htm");
@@ -252,21 +206,13 @@ public class LotteryService {
         return gift;
     }
 
-    public String run(String phone, User user, BaiDuAIService baiDuAIService){
+    public String run(String phone){
         String userId = getUserId();
-        byte[] captchaImg = null;
         String encryptMobile = null;
         String code = null;
         String gifts = "";
         while (true){
             code = getCaptcha(getCaptchaUrl(userId));
-            if (code == null){
-                captchaImg = getCaptchaImg(userId);
-                code = baiDuAIService.Literacy(captchaImg, user);
-            }
-            if (code == null){
-                continue;
-            }
             encryptMobile = getMobile(phone, code, userId);
             if (encryptMobile != null){
                 break;

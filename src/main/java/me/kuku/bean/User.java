@@ -9,7 +9,6 @@ import java.util.List;
 @ConfigurationProperties(prefix = "user")
 public class User {
     private int max;
-    private List<Key> key;
     private HtmlCon htmlCon;
 
     public HtmlCon getHtmlCon() {
@@ -26,13 +25,5 @@ public class User {
 
     public void setMax(int max) {
         this.max = max;
-    }
-
-    public List<Key> getKey() {
-        return key;
-    }
-
-    public void setKey(List<Key> key) {
-        this.key = key;
     }
 }

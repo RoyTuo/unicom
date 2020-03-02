@@ -5,10 +5,8 @@ import me.kuku.entity.PhoneLa;
 import me.kuku.entity.Prize;
 import me.kuku.repository.PhoneRepository;
 import me.kuku.repository.PrizeRepository;
-import me.kuku.service.BaiDuAIService;
 import me.kuku.service.LotteryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -53,7 +51,7 @@ public class LotteryScheduled {
             }
             if (num >= 1000) continue;
             LotteryService lotteryService = new LotteryService();
-            String gifts = lotteryService.run(phone, user, new BaiDuAIService());
+            String gifts = lotteryService.run(phone);
             if (gifts == null || gifts.contains("没有抽奖次数了")){
                 phoneRepository.delete(phoneLa);
                 continue;
