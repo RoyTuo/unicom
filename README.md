@@ -8,8 +8,8 @@
 编译包下载： [https://github.com/kukume/unicom/releases/](https://github.com/kukume/unicom/releases/)
 
 ## 环境
-* JDK
-* MySQL
+* JDK1.8
+* MySQL（如使用mysql）
 * nginx/apache（如需域名访问）
 
 快捷方法安装吧。
@@ -32,29 +32,17 @@ wget -O install.sh http://download.bt.cn/install/install-ubuntu_6.0.sh && bash i
 
 下载[编译包](https://github.com/kukume/unicom/releases)，更改`application.yml`中的配置
 
-~~`apikey`和`secretKey`为百度ai的[数字识别](https://ai.baidu.com/tech/ocr_others/numbers)，创建应用，选择数字识别，把key填进去即可。~~
-
-大佬的接口gg了，自己整了一个。不需要填入百度ai的key了
-
-其余部分配置见图：
-
-![](https://img.kuku.me/links/kuku/126cb0211042025.png)
-
 然后把`unicom.jar`和`application.yml`放到同一文件夹下，比如我的文件都在`/root/java`文件下
 
 运行
 ```shell
 cd /root/java
 java -jar unicom.jar
-#这样的话首次获取session的时间会非常长，可以这样运行
-java -Djava.security.egd=file:/dev/./urandom -jar unicom.jar
 ```
 如需持久化运行，可以使用`screen`
 ```shell
 cd /root/java
 screen -dmS unicom java -jar unicom.jar
-#这样的话首次获取session的时间会非常长，可以这样运行
-screen -dmS unicom java -Djava.security.egd=file:/dev/./urandom -jar unicom.jar
 ```
 运行之后打开`http://IP地址:8099`即可
 
