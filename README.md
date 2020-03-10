@@ -16,21 +16,21 @@ apt-get install tesseract-ocr
 
 安装python
 
-```
+```shell
 #如是debian
 apt-get install python3
 apt-get install python3-pip
 ```
 
 安装依赖
-```
+```shell
 pip3 install requests
 pip3 install pytesseract
 pip3 install flask
 pip3 install Pillow
 ```
 后台执行
-```
+```shell
 python3 index.py
 #或者使用screen
 screen -dmS qdocr python3 index.py
