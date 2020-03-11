@@ -1,10 +1,6 @@
 # unicom
 ![https://img.shields.io/badge/language-java-orange.svg?style=flat-square](https://img.shields.io/badge/language-java-yellow.svg?longCache=true&style=popout-square)
 
-不会写东西，直接说一下怎么使用啦。。
-
-一直有sb在刷我的识别验证码的api，所以我把api关了。
-
 ## api安装
 需要安装[tesseract-ocr](https://digi.bib.uni-mannheim.de/tesseract/)
 ```shell
@@ -39,6 +35,9 @@ screen -dmS qdocr python3 index.py
 然后更改配置文件中的api地址（稍后更新）
 
 api源码大部分来自[https://github.com/teenyda/qingdao](https://github.com/teenyda/qingdao)
+
+## 百度AI
+在[百度ai](https://ai.baidu.com/tech/ocr/general)申请带数字识别的应用，填入配置文件即可
 
 编译包下载： [https://github.com/kukume/unicom/releases/](https://github.com/kukume/unicom/releases/)
 

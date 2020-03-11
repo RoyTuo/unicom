@@ -99,35 +99,16 @@ public class FlowController {
 
     @RequestMapping("/get")
     @ResponseBody
-    public Integer getCaptcha(@RequestParam("phone") String phone, HttpServletRequest request){
-        //不知道联通识别验证码是不是需要cookie来识别的。。所以把httpClient存在session中
-        FlowService flow = new FlowService();
-        Integer i = flow.getCaptcha(phone);
-        if (i == 1){
-            HttpSession session = request.getSession();
-            session.setMaxInactiveInterval(60 * 5);
-            session.setAttribute("client", flow.getHttpClient());
-        }
+    public Integer getCaptcha(@RequestParam("phone") String phone){
+        Integer i = flowService.getCaptcha(phone);
         return i;
     }
 
     @RequestMapping("/verify")
     @ResponseBody
-    public boolean verifyCaptcha(@RequestParam("phone") String phone, @RequestParam("captcha") String captcha, HttpServletRequest request){
-        HttpSession session = request.getSession();
-        CloseableHttpClient client = (CloseableHttpClient) session.getAttribute("client");
-        if (client == null){
-            //过期了
-            return false;
-        }else{
-            FlowService flow = new FlowService();
-            flow.setHttpClient(client);
-            boolean b = flow.receiveFlow(phone, captcha);
-            if (b) {
-                session.invalidate();
-            }
-            return b;
-        }
+    public boolean verifyCaptcha(@RequestParam("phone") String phone, @RequestParam("captcha") String captcha){
+        boolean b = flowService.receiveFlow(phone, captcha);
+        return b;
     }
 
     @GetMapping("/creatCode")

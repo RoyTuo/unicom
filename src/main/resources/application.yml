@@ -30,7 +30,7 @@ spring:
     ##如使用mysql数据库注释h2部分
 user:
   #添加挂机手机号的最大值
-  max: 600
+  max: 350
   #懒得用数据库了，用数据库我还要写后台，我懒
   htmlCon:
     #标题
@@ -43,4 +43,17 @@ user:
     ico: https://www.kuku.me/favicon.ico
   #定时器
   #此为每天的00:01运行
-  cron: 0 20 0 * * ?
+  cron: 0 0 12 * * ?
+  api: http://localhost:5000/getCode
+  # type 0   为ocr接口      1    为百度ai
+  type: 1
+  #此为百度ai的秘钥，支持多个key，每个key调用199次切换下一个。
+  key:
+    - apiKey: xxx
+      secretKey: xxx
+#    - apiKey: xxx
+#      secretKey: xxx
+#    - apiKey: xxx
+#      secretKey: xxx
+#    - apiKey: xxx
+#      secretKey: xxx

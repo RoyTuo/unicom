@@ -148,7 +148,7 @@
                     $(".rush").attr("type", "button");
                 }else if (data === -1){
                     //
-                    showModal("<p>获取验证码失败（可能已获取3次，可能已获取但是没有验证成功，鬼知道什么原因！）</p>")
+                    showModal("<p>获取验证码失败</p>")
                 }else if (data === 0){
                     showModal("<p>该号码不是联通号码</p>")
                 }
@@ -158,7 +158,7 @@
             let form = new FormData(document.getElementById("flow"));
             ajaxRequest("verify", form, function (data) {
                 if (data == false){
-                    showModal("<p>验证码错误或者失效或者是其它稀奇古怪的原因</p>")
+                    showModal("<p>验证码错误或者失效</p>")
                 }else{
                     alert("领取成功")
                     location.reload()
@@ -185,7 +185,7 @@
                 func(data)
             },
             error: function (data) {
-                showModal("<p>网络链接异常或者是我写的BUG触发了</p>")
+                showModal("<p>网络链接异常或者是BUG触发了</p>")
             }
         })
     }
