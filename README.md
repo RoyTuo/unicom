@@ -6,9 +6,14 @@
 ```shell
 #如是debian
 apt-get install tesseract-ocr
+#如是centos
+yum install tesseract
 ```
 
-下载[py](https://u.iheit.com/index.py)，
+下载[py](https://u.iheit.com/index.py)，或者
+```shell
+wget https://u.iheit.com/index.py
+```
 
 安装python
 
