@@ -2,111 +2,79 @@ package me.kuku.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baidu.aip.ocr.AipOcr;
+import me.kuku.bean.Key;
 import me.kuku.bean.User;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
+import me.kuku.utils.OkHttpClientUtil;
+import okhttp3.FormBody;
+import okhttp3.Response;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class LotteryService {
 
-    private CloseableHttpClient httpClient = null;
-    private BasicCookieStore basicCookieStore = null;
-    private RequestConfig requestConfig = null;
+    private OkHttpClientUtil okHttpClientUtil;
     @Autowired
     User user;
 
     public LotteryService(){
-        basicCookieStore = new BasicCookieStore();
-        requestConfig = RequestConfig.custom().setConnectionRequestTimeout(10000).setSocketTimeout(10000)
-                .setConnectionRequestTimeout(10000).build();
-        httpClient = HttpClients.custom().setDefaultCookieStore(basicCookieStore).setDefaultRequestConfig(requestConfig).build();
+        okHttpClientUtil = OkHttpClientUtil.getInstance();
     }
 
-    public String getUserId(){
-        RequestUtil.request(HttpGet.class, httpClient, "http://m.client.10010.com/sma-lottery/qpactivity/qingpiindex",
-                null, String.class);
-        String id = null;
-        List<Cookie> cookies = basicCookieStore.getCookies();
-        for (Cookie cookie : cookies){
-            if (cookie.getName().equals("JSESSIONID")){
-                id = cookie.getValue();
-                break;
-            }
-        }
-        return id;
+    //获取userId
+    private String getUserId() throws IOException {
+        Response response = okHttpClientUtil.get("http://m.client.10010.com/sma-lottery/qpactivity/qingpiindex");
+        response.close();
+        Map<String, String> map = okHttpClientUtil.getCookie(response, "JSESSIONID");
+        return map.get("JSESSIONID");
     }
 
-    public String getCaptchaUrl(String userId){
+    //获取图片地址
+    private String getCaptchaUrl(String userId){
         return "http://m.client.10010.com/sma-lottery/qpactivity/getSysManageLoginCode.htm?userid=" + userId + "&code=" + new Date().getTime();
     }
 
-    public byte[] getCaptchaImg(String userId){
-        byte[] bytes = RequestUtil.request(HttpGet.class, httpClient, getCaptchaUrl(userId), null, byte[].class);
-        return bytes;
+    //获取图片流
+    private byte[] getCaptchaImg(String url) throws IOException {
+        Response response = okHttpClientUtil.get(url);
+        return Objects.requireNonNull(response.body()).bytes();
     }
 
     //通过ocr的api调用
-    public String getCaptcha(String captchaUrl){
-        String str = RequestUtil.request(HttpPost.class, httpClient, user.getApi(),
-                Arrays.asList(new BasicNameValuePair("url", captchaUrl)), String.class);
-        return str;
+    public String getCaptcha(String captchaUrl) throws IOException {
+        Response response = okHttpClientUtil.post(user.getApi(), new FormBody.Builder().add("url", captchaUrl).build());
+        return Objects.requireNonNull(response.body()).string();
     }
 
+    //加密手机号
     //返回值为null  为验证码错误
-    public String getMobile(String phone, String captcha, String userId){
-        String str = RequestUtil.request(HttpPost.class, httpClient, "http://m.client.10010.com/sma-lottery/validation/qpImgValidation.htm",
-                Arrays.asList(new BasicNameValuePair("mobile", phone),
-                        new BasicNameValuePair("image", captcha),
-                        new BasicNameValuePair("userid", userId)), String.class);
+    public String getMobile(String phone, String captcha, String userId) throws IOException {
+        Response response = okHttpClientUtil.post("http://m.client.10010.com/sma-lottery/validation/qpImgValidation.htm", new FormBody.Builder()
+                .add("mobile", phone)
+                .add("image", captcha)
+                .add("userid", userId).build());
+        String str = Objects.requireNonNull(response.body()).string();
         String mobile = null;
-        //这里经常会链接超时，，可能会出现空指针
-        try {
-            JSONObject jsonObject = JSON.parseObject(str);
-            if (jsonObject.getString("code").equals("YES")){
-                mobile = jsonObject.getString("mobile");
-            }
-        } catch (Exception e){
-            return null;
+        JSONObject jsonObject = JSON.parseObject(str);
+        if (jsonObject.getString("code").equals("YES")){
+            mobile = jsonObject.getString("mobile");
         }
         return mobile;
     }
 
-    public String lottery(String encryptPhone, String captcha, String userId){
-        String result = RequestUtil.request(HttpPost.class, httpClient, "http://m.client.10010.com/sma-lottery/qpactivity/qpLuckdraw.htm",
-                Arrays.asList(new BasicNameValuePair("mobile", encryptPhone),
-                        new BasicNameValuePair("image", captcha),
-                        new BasicNameValuePair("userid", userId)), String.class);
+    //抽奖
+    public String lottery(String encryptPhone, String captcha, String userId) throws IOException {
+        Response response = okHttpClientUtil.post("http://m.client.10010.com/sma-lottery/qpactivity/qpLuckdraw.htm", new FormBody.Builder()
+                .add("mobile", encryptPhone)
+                .add("image", captcha)
+                .add("userid", userId).build());
+        String result = Objects.requireNonNull(response.body()).string();
         String gift = null;
-        //{"data":{"assetCategory":"0","assetName":"100MB","everyDayNum":"2000","id":"qp100","level":"6","price":"100","prizeCount":"17694885424"},"isunicom":true,"msg":"2","status":200}
-        //{"data":{"assetName":"幸运奖","level":"3","prizeCount":"15529772351"},"isunicom":true,"msg":"1","status":0}
-        //{"data":{"assetName":"幸运奖","level":"3","prizeCount":"15529772351"},"isunicom":true,"msg":"0","status":0}
-        //看level的值
-        //1、50mb流量   2、100mb流量  3、200mb流量  4、1000mb流量  5、20砖石  6、15元开卡红包  7、50元开卡红包
-        //1、100mb流量  2、50元开卡礼包  3、幸运奖  4、50mb流量  5、10000mb流量  6、15元开卡礼包  7、20钻石
-        //1、50mb流量  2、100mb流量  3、幸运奖  4、10000mb流量  5、20钻石  6、15元开卡礼包  7、50元开卡礼包
-        //isunicom=false  错误 然后读msg
-        //status = 200 or status = 0 正常
-        //status = 500 没有抽奖次数了
-        //status = 400 or status = 700 抽奖人数过多
         JSONObject jsonObject = JSON.parseObject(result);
         Integer status = jsonObject.getInteger("status");
         if (status == 500){
@@ -148,23 +116,41 @@ public class LotteryService {
         return gift;
     }
 
-    public String run(String phone, BaiDuAIService baiDuAIService) throws Exception{
-        String code = null, mobile = null;
-        String userId = getUserId();
-        String captchaUrl = getCaptchaUrl(userId);
-        while (true) {
-            if (user.getType() == 0) code = getCaptcha(captchaUrl);
-            else {
-                byte[] captchaImg = getCaptchaImg(userId);
-                code = baiDuAIService.Literacy(captchaImg, user);
+    public String run(AipOcr aipOcr, String phone){
+        try {
+            //首先获取用户id
+            String userId = getUserId();
+            String mobile, code;
+            //取验证码url
+            for (; ; ) {
+                String captchaUrl = getCaptchaUrl(userId);
+                if (user.getType() == 0) {
+                    //ocr
+                    code = getCaptcha(captchaUrl);
+                } else {
+                    //百度
+                    org.json.JSONObject jsonObject = aipOcr.numbers(getCaptchaImg(captchaUrl), null);
+                    if (jsonObject.has("error_msg")) return "百度ai次数超限";
+                    JSONArray jsonArray = jsonObject.getJSONArray("words_result");
+                    if (jsonArray.length() == 0) continue;
+                    code = jsonArray.getJSONObject(0).getString("words");
+                    if (code.length() != 4) continue;
+                }
+                mobile = getMobile(phone, code, userId);
+                if (mobile == null)
+                    continue;
+                else break;
             }
-            mobile = getMobile(phone, code, userId);
-            if (mobile == null) continue;
-            else break;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 3; i++) {
+                String lottery = lottery(mobile, code, userId);
+                sb.append(lottery).append("；");
+            }
+            System.out.println(sb.toString());
+            return sb.toString();
+        }catch (Exception e){
+            return "抽奖失败";
         }
-        String gifts = "";
-        for (int i = 0; i < 3; i++) gifts += lottery(mobile, code, userId) + "；";
-        return gifts;
     }
 
 }

@@ -7,18 +7,13 @@ import me.kuku.repository.PhoneRepository;
 import me.kuku.repository.PrizeRepository;
 import me.kuku.service.CodeService;
 import me.kuku.service.FlowService;
-import me.kuku.service.LotteryService;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -99,14 +94,14 @@ public class FlowController {
 
     @RequestMapping("/get")
     @ResponseBody
-    public Integer getCaptcha(@RequestParam("phone") String phone){
+    public Integer getCaptcha(@RequestParam("phone") String phone) throws IOException {
         Integer i = flowService.getCaptcha(phone);
         return i;
     }
 
     @RequestMapping("/verify")
     @ResponseBody
-    public boolean verifyCaptcha(@RequestParam("phone") String phone, @RequestParam("captcha") String captcha){
+    public boolean verifyCaptcha(@RequestParam("phone") String phone, @RequestParam("captcha") String captcha) throws IOException {
         boolean b = flowService.receiveFlow(phone, captcha);
         return b;
     }

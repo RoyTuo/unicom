@@ -1,12 +1,14 @@
 package me.kuku.scheduled;
 
+import com.baidu.aip.ocr.AipOcr;
+import me.kuku.bean.Key;
 import me.kuku.bean.User;
 import me.kuku.entity.PhoneLa;
 import me.kuku.entity.Prize;
 import me.kuku.repository.PhoneRepository;
 import me.kuku.repository.PrizeRepository;
-import me.kuku.service.BaiDuAIService;
 import me.kuku.service.LotteryService;
+import me.kuku.utils.LotteryUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,45 +34,39 @@ public class LotteryScheduled {
 
     @Scheduled(cron = "${user.cron}")
     public void flow() throws Exception{
-        delPrize();
-        BaiDuAIService baiDuAIService = new BaiDuAIService();
+        LotteryUtil.delPrize(prizeRepository);
         List<PhoneLa> phoneAll = phoneRepository.findAll();
-        String phone = "";
+        int num = 0,round = 0;
+        AipOcr aipOcr = null;
+        List<Key> keyList = user.getKey();
         for (PhoneLa phoneLa : phoneAll){
-            phone = phoneLa.getPhone();
-            int num = getAllFlow(phone);
-            if (num >= 1000) continue;
-            String gifts = lotteryService.run(phone, baiDuAIService);
+            String phone = phoneLa.getPhone();
+            //1000M流量以上不再抽奖
+            int allFlow = LotteryUtil.getAllFlow(prizeRepository, phone);
+            if (allFlow >= 1000) continue;
+            //抽奖
+            if (user.getType() == 1){
+                if (num == 199) round++;
+                if (round >= keyList.size()) break;
+                Key key = keyList.get(round);
+                if (num++ == 0)
+                    aipOcr = new AipOcr(key.getApiId(), key.getApiKey(), key.getSecretKey());
+            }
+            String gifts = lotteryService.run(aipOcr, phone);
             if (gifts == null || gifts.contains("联通")){
                 //删除不是联通的号码
                 phoneRepository.delete(phoneLa);
                 continue;
             }
+            if (gifts.contains("超限")){
+                round++;
+                num = 0;
+            }
             prizeRepository.save(new Prize(null, phone, gifts, new Date(new java.util.Date().getTime())));
         }
     }
 
-    public Integer getAllFlow(String phone){
-        List<Prize> prizes = prizeRepository.findAllByPhone(phone);
-        int num = 0;
-        for (Prize prize : prizes){
-            String p = prize.getPrize();
-            String[] split = p.split("；");
-            for (String str : split){
-                if (str.contains("流量")){
-                    String sss = str.substring(0, str.lastIndexOf("m"));
-                    num += Integer.parseInt(sss);
-                }
-            }
-        }
-        return num;
-    }
 
-    public void delPrize(){
-        Calendar calendar = Calendar.getInstance(Locale.CHINA);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        if (day == 1){
-            prizeRepository.deleteAll();
-        }
-    }
+
+
 }
